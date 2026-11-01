@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Court of Moravia – Zrcadlo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500&family=Geist+Mono:wght@400&display=swap">
+<style>
+/* Layout: první obrazovka jako rozhovor o třech scénách (otázka → věty bolestí → odpověď). Každá scéna má jednu věc, zbytek je tma a prostor. */
+:root{
+  --bg:#050505; --bg2:#0B0B0B; --line:#22201E; --line2:#34302D;
+  --fg:#EAE7E0; --fg2:#B5B1AB; --mute:#8F8B85; --red:#CE1616;
+  --display:"Inter Tight",ui-sans-serif,system-ui,sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:dark;
+}
+html,body{background:var(--bg);color:var(--fg)}
+[hidden]{display:none!important}
+body{font-family:var(--display);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.wrap{padding-left:max(clamp(16px,4vw,56px),env(safe-area-inset-left,0px));padding-right:max(clamp(16px,4vw,56px),env(safe-area-inset-right,0px))}
+.link{font:inherit;font-size:14px;color:var(--fg2);background:none;border:0;border-bottom:1px solid var(--line);padding:0 0 2px;min-height:44px;display:inline-flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none}
+.link:hover{color:var(--fg);border-color:var(--red)}
+.ghost{font:inherit;font-size:14px;color:var(--mute);background:none;border:0;padding:0;min-height:44px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.ghost:hover{color:var(--fg)}
+
+/* stage */
+.stage{position:relative;min-height:100svh;display:flex;flex-direction:column;overflow:hidden}
+#fx{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stage .crown{position:absolute;right:-8%;bottom:-12%;width:min(56vw,700px);opacity:.04;pointer-events:none}
+.top{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:16px;padding-block:22px}
+.top img{height:30px;width:auto;display:block}
+.inner{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1440px;width:100%;margin:0 auto;box-sizing:border-box;padding-block:32px 40px}
+.foot{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:16px;padding-block:0 24px}
+.ticks{display:flex;gap:6px}
+.ticks i{width:28px;height:2px;background:rgba(234,231,224,.14);transition:background .6s}
+.ticks i.on{background:var(--red)}
+.step{animation:in .9s ease both}
+.fade{animation:in .7s ease both}
+@keyframes in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* 1: otázka */
+h1 em{font-style:normal;color:var(--red)}
+h1{margin:0;font-weight:300;font-size:clamp(40px,7.4vw,116px);line-height:1;letter-spacing:-.035em;max-width:13ch;text-wrap:balance}
+.opts{display:flex;flex-wrap:wrap;gap:12px 36px;margin-top:clamp(32px,5vw,60px)}
+.opt{font:inherit;font-size:clamp(18px,2vw,24px);font-weight:300;color:var(--fg2);background:none;border:0;border-bottom:1px solid var(--line);padding:6px 0;cursor:pointer;min-height:44px;transition:color .4s,opacity .5s,border-color .4s}
+.opt:hover{color:var(--fg);border-color:var(--red);opacity:1}
+.opts.done .opt{opacity:.32}
+.opts.done .opt[aria-pressed="true"]{opacity:1;color:var(--fg);border-color:var(--red)}
+.reply{display:flex;flex-wrap:wrap;align-items:center;gap:20px clamp(28px,4vw,56px);margin-top:clamp(28px,4vw,48px)}
+.reply p{margin:0;font-size:clamp(22px,2.8vw,40px);font-weight:300;line-height:1.2;letter-spacing:-.02em;flex:0 0 auto;width:min(26ch,100%);min-height:2.4em;display:flex;align-items:center}
+
+.next{font:inherit;font-size:16px;color:var(--fg);background:var(--red);border:0;border-radius:999px;padding:0 26px;min-height:52px;display:inline-flex;align-items:center;gap:12px;cursor:pointer;animation:pulse 2.2s ease-out infinite}
+.next:hover{filter:brightness(1.1);animation:none}
+.next svg{transition:transform .3s}
+.next:hover svg{transform:translateX(4px)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(206,22,22,.55)}70%{box-shadow:0 0 0 16px rgba(206,22,22,0)}100%{box-shadow:0 0 0 0 rgba(206,22,22,0)}}
+
+/* 2: seznam vět */
+.head{display:flex;flex-direction:column;gap:14px;margin-bottom:clamp(32px,4.4vw,56px);padding-bottom:clamp(20px,2.6vw,28px);border-bottom:1px solid var(--line)}
+.head h2{margin:0;font-weight:400;font-size:clamp(26px,3.2vw,46px);line-height:1.05;letter-spacing:-.03em;color:var(--fg);max-width:22ch;text-wrap:balance}
+.head h2 em{font-style:normal;color:var(--red)}
+.cloud{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:clamp(10px,1.8vw,26px) clamp(20px,3.2vw,48px);padding-inline:4%}
+.cloud button{font:inherit;font-weight:300;font-style:italic;letter-spacing:-.02em;line-height:1.15;color:var(--fg2);background:none;border:0;padding:8px 2px;min-height:44px;cursor:pointer;text-align:center;transition:color .4s;animation:drift var(--d,9s) ease-in-out var(--dl,0s) infinite alternate}
+.cloud button::after{content:"";display:block;height:1px;margin-top:6px;background:var(--red);transform:scaleX(0);transition:transform .4s}
+.cloud button:hover{color:var(--fg)}
+.cloud button:hover::after{transform:scaleX(1)}
+.cloud button.was{color:var(--fg)}
+.cloud .s1{font-size:clamp(22px,2.6vw,38px)}
+.cloud .s2{font-size:clamp(18px,2vw,28px)}
+.cloud .s3{font-size:clamp(16px,1.6vw,22px)}
+/* Hlasy: věty jako výpovědi, každá s podpisem role; zlatý standard poslední v mřížce a zvýrazněný */
+.voices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(36px,4.4vw,72px) clamp(32px,5vw,80px);align-items:start}
+.voices button{font:inherit;background:none;border:0;padding:0;text-align:left;cursor:pointer;color:var(--fg);display:flex;flex-direction:column;gap:14px;min-width:0;transition:opacity .5s}
+.voices .who{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+.voices .q{font-weight:300;font-size:clamp(20px,2vw,30px);line-height:1.18;letter-spacing:-.02em;max-width:17ch;text-wrap:balance}
+.voices .q::before{content:"„"}
+.voices .q::after{content:"“"}
+.voices em{font-style:normal;transition:color .5s}
+.voices button:hover em,.voices button:focus-visible em{color:var(--red)}
+.voices button.gold .who{display:flex;align-items:center;gap:12px;color:var(--fg)}
+.voices button.gold .who::before{content:"";width:28px;height:1px;background:var(--red)}
+.voices button.gold .q{font-weight:400}
+.voices .q{transition:transform .5s ease}
+@media (hover:hover){.voices button:hover .q,.voices button:focus-visible .q{transform:translateX(6px)}}
+@media (max-width:860px){.voices{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.voices{grid-template-columns:minmax(0,1fr);gap:32px}}
+.list{display:flex;flex-direction:column;align-items:flex-start;gap:clamp(4px,.8vw,10px)}
+.list button{font:inherit;font-weight:300;font-size:clamp(24px,3vw,44px);line-height:1.12;letter-spacing:-.025em;color:var(--fg2);background:none;border:0;padding:6px 0;min-height:44px;cursor:pointer;text-align:left;opacity:.6;transition:color .4s,opacity .4s}
+.list button:hover,.list button:focus-visible{opacity:1;color:var(--fg)}
+.or{display:flex;align-items:center;gap:16px;width:100%;margin:clamp(18px,2.6vw,32px) 0 clamp(2px,.6vw,8px)}
+.or::after{content:"";width:min(160px,30%);height:1px;background:var(--line2)}
+@keyframes drift{from{transform:translate(0,0)}to{transform:translate(var(--x,6px),var(--y,-8px))}}
+
+/* 3: odpověď — jedna věta, jedna odpověď, jedna čára, jedno tlačítko */
+.scene3{display:flex;flex-direction:column;gap:0;max-width:1080px}
+.chosen{margin:0;font-weight:300;font-style:italic;font-size:clamp(40px,6.6vw,104px);line-height:1;letter-spacing:-.04em;max-width:16ch;text-wrap:balance}
+.chosen em{font-style:italic;color:var(--red)}
+.answer{margin:clamp(28px,3.6vw,48px) 0 0;max-width:34ch;font-weight:300;font-size:clamp(20px,2vw,28px);line-height:1.35;letter-spacing:-.01em;color:var(--fg2)}
+.r1{animation:in 1s ease both}
+.r2{animation:in 1s ease .55s both}
+.r3{animation:in 1s ease 1.1s both}
+.r4{animation:in 1s ease 1.6s both}
+.pcd{margin-top:clamp(40px,5vw,72px);max-width:620px}
+.pcd .eyebrow{display:block;margin-bottom:14px;font-size:11px}
+.bar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.seg{display:flex;flex-direction:column;gap:12px;min-width:0}
+.seg i{position:relative;display:block;height:2px;background:var(--line2);overflow:hidden}
+.seg i::after{content:"";position:absolute;inset:0;background:var(--red);transform:scaleX(0);transform-origin:left;transition:transform .7s ease}
+.seg span{font-size:13px;color:var(--mute);transition:color .6s}
+.seg.on span{color:var(--fg)}
+.pcd.go .seg.on i::after{transform:scaleX(1)}
+.pcd.go .seg.on:nth-child(1) i::after{transition-delay:1.5s}
+.pcd.go .seg.on:nth-child(2) i::after{transition-delay:1.9s}
+.pcd.go .seg.on:nth-child(3) i::after{transition-delay:2.3s}
+.acts{display:flex;flex-wrap:wrap;align-items:center;gap:12px 28px;margin-top:clamp(40px,5vw,64px)}
+.send{font:inherit;font-size:15px;font-weight:500;color:var(--bg);background:var(--fg);border:0;border-radius:999px;padding:0 26px;min-height:50px;cursor:pointer;transition:background .3s,box-shadow .3s}
+.send:hover{background:#fff;box-shadow:0 0 0 6px rgba(234,231,224,.08)}
+.contact{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0;width:min(320px,100%)}
+.field label{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.field input{font:inherit;font-size:18px;color:var(--fg);background:none;border:0;border-bottom:1px solid var(--line2);padding:8px 0;min-height:44px;width:100%;box-sizing:border-box}
+.field input:focus{outline:none;border-color:var(--red)}
+.err{margin:10px 0 0;font-size:14px;color:#E46A6A}
+.thanks{margin:0;font-size:18px;color:var(--fg)}
+
+/* Mistři: společný blok na každé stránce, nikdo konkrétní, celý tým */
+.team{border-top:1px solid var(--line);padding-block:clamp(56px,7vw,96px) clamp(64px,9vw,120px)}
+.team h2 em{font-style:normal;color:var(--red)}
+.team h2{margin:0;font-weight:300;font-size:clamp(34px,4.8vw,72px);line-height:1.05;letter-spacing:-.03em;max-width:20ch}
+.team .teamsub{margin:12px 0 0;max-width:44ch;font-size:clamp(17px,1.5vw,20px);color:var(--fg2)}
+.team .people{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(28px,3.6vw,56px) clamp(24px,3vw,48px);margin-top:clamp(40px,4.6vw,64px)}
+.team .person{display:flex;align-items:center;gap:18px;min-width:0}
+.team .person img{width:clamp(72px,7vw,104px);height:clamp(72px,7vw,104px);object-fit:cover;border-radius:50%;filter:grayscale(1) contrast(1.05);flex:none}
+.team .person h3{margin:0;font-weight:400;font-size:clamp(18px,1.6vw,22px);letter-spacing:-.01em}
+.team .person p{margin:4px 0 0;font-size:14px;line-height:1.45;color:var(--fg2);max-width:30ch}
+@media (max-width:980px){.team .people{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){.team .people{grid-template-columns:minmax(0,1fr)}}
+
+/* závěrečný kontakt */
+.endc{border-top:1px solid var(--line);padding-block:clamp(56px,7vw,96px) clamp(80px,10vw,140px)}
+.endc h2{margin:0;font-weight:300;font-size:clamp(34px,4.8vw,72px);line-height:1;letter-spacing:-.035em}
+.endc form{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 20px;margin-top:clamp(28px,3vw,44px)}
+.endc .thanks{margin-top:24px}
+/* patička */
+.foot2{border-top:1px solid var(--line);padding-block:clamp(40px,5vw,64px) clamp(40px,5vw,64px);font-size:13px;color:var(--mute)}
+.foot2 img{height:26px;width:auto;display:block;opacity:.8}
+.foot2 .cols{display:flex;flex-wrap:wrap;gap:20px clamp(40px,6vw,96px);margin-top:28px}
+.foot2 .cols p{margin:0;line-height:1.7}
+.foot2 a{color:var(--fg2);text-decoration:none}
+.foot2 a:hover{color:var(--fg)}
+.foot2 .copy{margin:28px 0 0;color:var(--mute)}
+/* rest of site placeholder */
+.rest{background:var(--bg2);border-top:1px solid var(--line)}
+.rest .in{max-width:1440px;margin:0 auto;padding-block:clamp(72px,10vw,140px)}
+.rest h2{margin:14px 0 0;font-weight:300;font-size:clamp(30px,4vw,56px);line-height:1.05;letter-spacing:-.03em;max-width:20ch}
+.rest p{margin:18px 0 0;color:var(--fg2);max-width:52ch}
+
+@media (max-width:640px){.top img{height:26px}.cloud{justify-content:flex-start;padding-inline:0}.cloud button{text-align:left}.seg span{font-size:12px}}
+@media (prefers-reduced-motion:reduce){.next{animation:none}.step,.fade,.r1,.r2,.r3,.r4{animation:none}.cloud button{animation:none}.seg i::after{transition:none!important}}
+
+/* Celek: jeden rytmus sekcí (střídání tmy a atmosféry místo čar), jedna typografie, jedno červené slovo v každém nadpisu */
+.team{background:var(--bg2);border-top:0}
+.team h2,.endc h2,.contact h2,.pcd h2,.story h2{font-weight:300;font-size:clamp(34px,4.8vw,72px);line-height:1.02;letter-spacing:-.035em;max-width:18ch;text-wrap:balance}
+.endc h2 em,.contact h2 em,.pcd h2 em,.story h2 em{font-style:normal;color:var(--red)}
+.team .people{gap:clamp(40px,5vw,72px) clamp(28px,3vw,56px)}
+.team .person{flex-direction:column;align-items:flex-start;gap:18px}
+.team .person img{width:clamp(120px,11vw,168px);height:clamp(120px,11vw,168px)}
+.team .person h3{font-size:clamp(20px,1.8vw,26px)}
+.team .person p{font-size:15px;max-width:28ch}
+.endc{position:relative;overflow:hidden;border-top:0}
+.endc::before{content:"";position:absolute;left:-20%;bottom:-50%;width:80%;height:160%;background:radial-gradient(closest-side,rgba(206,22,22,.20),rgba(206,22,22,0));pointer-events:none}
+.endc .wrap{position:relative;z-index:1}
+.crown2{position:absolute;right:-6%;bottom:-24%;width:min(46vw,560px);opacity:.035;pointer-events:none}
+.endc .field{width:min(440px,100%)}
+.endc .field input{font-size:22px}
+.foot2{background:#000}
+@media (max-width:620px){.team .person{flex-direction:row;align-items:center}.team .person img{width:88px;height:88px}}
+.stage::after{content:"";position:absolute;left:0;right:0;bottom:0;height:180px;background:linear-gradient(180deg,rgba(11,11,11,0),var(--bg2));pointer-events:none;z-index:1}
+
+/* Mistři kompaktně: jedna řada šesti tváří, menší nadpis i odsazení */
+.team{padding-block:clamp(48px,6vw,80px)}
+.team h2{font-size:clamp(28px,3.2vw,46px)}
+.team .people{grid-template-columns:repeat(6,minmax(0,1fr));gap:24px clamp(16px,2vw,28px);margin-top:clamp(28px,3vw,40px)}
+.team .person{flex-direction:column;align-items:flex-start;gap:12px}
+.team .person img{width:clamp(96px,8vw,124px);height:clamp(96px,8vw,124px);filter:grayscale(1) contrast(1.08) brightness(1.08)}
+.team .person h3{font-size:17px;line-height:1.25}
+.team .person p{font-size:13px;line-height:1.45;margin-top:4px}
+@media (max-width:1180px){.team .people{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:620px){.team .people{grid-template-columns:minmax(0,1fr);gap:18px}.team .person{flex-direction:row;align-items:center;gap:14px}.team .person img{width:76px;height:76px}}
+
+/* Proof: kde jsme pracovali (tichý text, jedna barva, velká jména o stupeň výraznější) */
+.proof{padding-block:clamp(48px,6vw,88px);border-top:1px solid var(--line)}
+.proof h2{margin:0;font-weight:300;font-size:clamp(28px,3.2vw,46px);line-height:1.05;letter-spacing:-.03em}
+.proof h2 em{font-style:normal;color:var(--red)}
+.proof .names{list-style:none;margin:clamp(28px,3vw,40px) 0 0;padding:0;display:flex;flex-wrap:wrap;gap:10px 0;font-weight:300;font-size:clamp(18px,1.7vw,24px);line-height:1.3;letter-spacing:-.01em;color:var(--mute)}
+.proof .names li{white-space:nowrap}
+.proof .names li:not(:last-child)::after{content:"·";margin:0 .55em;color:#4a4541}
+.proof .names li.b{color:var(--fg)}
+.proof .more-names{display:flex;flex-wrap:wrap;gap:20px clamp(40px,6vw,96px);margin:clamp(28px,3vw,40px) 0 0}
+.proof .more-names div{min-width:0;max-width:60ch}
+.proof .more-names dt{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.proof .more-names dd{margin:8px 0 0;font-size:15px;line-height:1.6;color:var(--fg2)}
+@media (max-width:620px){.proof .names li{white-space:normal}}
+.proof{position:relative;overflow:hidden}
+.proof::before{content:"";position:absolute;right:-15%;top:-40%;width:65%;height:180%;background:radial-gradient(closest-side,rgba(206,22,22,.10),rgba(206,22,22,.04) 50%,rgba(206,22,22,0));pointer-events:none}
+.proof .wrap{position:relative}
+.proof .names li:not(:last-child)::after{color:var(--red);opacity:.7}
+.proof .names li{transition:color .9s ease,text-shadow .9s ease}
+.proof .names li.lit,.proof .names li:hover{color:#ff5a50;text-shadow:0 0 18px rgba(206,22,22,.55)}
+.proof .more-names dt{color:var(--red)}
+
+
+/* Gestalt: jedno plátno (jedna čerň, žádné pásy ani dělicí čáry), jedno světlo (silné u otázky, utichne u týmu a klientů, znovu se rozhoří u kontaktu), tři celky: rozhovor · kdo jsme · kontakt */
+.stage::after{height:280px;background:linear-gradient(180deg,rgba(5,5,5,0),rgba(5,5,5,.6) 55%,var(--bg))}
+.team,.team+.proof,.proof{background:transparent!important;border-top:0!important}
+.team{padding-block:clamp(72px,8vw,120px) clamp(28px,3vw,44px)}
+.proof{padding-block:clamp(28px,3vw,44px) clamp(72px,8vw,120px)}
+.proof::before{display:none}
+.endc{padding-block:clamp(96px,11vw,170px) clamp(120px,13vw,200px)}
+.endc::before{left:-30%;top:0;bottom:auto;width:120%;height:100%;background:radial-gradient(closest-side,rgba(206,22,22,.22),rgba(206,22,22,.12) 30%,rgba(206,22,22,.045) 60%,rgba(206,22,22,.01) 85%,rgba(206,22,22,0))}
+.endc::after{content:"";position:absolute;left:0;right:0;top:0;height:200px;background:linear-gradient(180deg,var(--bg),rgba(5,5,5,0));pointer-events:none}
+.endc{background:linear-gradient(0deg,var(--bg),rgba(5,5,5,0) 30%)}
+.endc .wrap{z-index:2}
+.foot2{background:var(--bg)!important;border-top:1px solid var(--line)}
+.crown2{right:3%;bottom:8%;width:min(30vw,380px);opacity:.03}
+@media (max-width:620px){.crown2{width:58vw;right:-8%;bottom:4%}}
+
+.talkpill{display:inline-flex;align-items:center;min-height:40px;padding:0 18px;border:1px solid rgba(234,231,224,.45)!important;border-radius:999px;color:var(--fg)!important;font:inherit;font-size:14px;text-decoration:none;background:none;cursor:pointer;transition:border-color .3s,background .3s}
+.talkpill:hover{border-color:var(--red)!important;background:rgba(206,22,22,.12)}
+
+/* Pätička: velký podpis, tři pojmenované skupiny, tichý právní řádek */
+.foot3{border-top:1px solid var(--line);padding-block:clamp(64px,8vw,120px) 28px;color:var(--fg2);background:var(--bg)}
+.foot3 .sig{margin:0;font-weight:300;font-size:clamp(40px,6.4vw,104px);line-height:1;letter-spacing:-.045em;color:var(--fg);max-width:none}
+.foot3 .sig em{font-style:normal;color:var(--red);white-space:nowrap}
+.foot3 .fcols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px clamp(24px,4vw,64px);margin-top:clamp(48px,6vw,88px)}
+.foot3 h2{margin:0 0 16px;font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.foot3 ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:16px}
+.foot3 a{color:var(--fg2);text-decoration:none;transition:color .3s}
+.foot3 a:hover{color:var(--fg)}
+.foot3 .fbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px 32px;margin-top:clamp(48px,6vw,88px);padding-top:22px;border-top:1px solid var(--line);font-size:13px;color:var(--mute)}
+.foot3 .fbar img{height:14px;width:auto;margin-right:12px;vertical-align:-2px;opacity:.6}
+.foot3 .fbar a{color:var(--mute)}
+@media (max-width:720px){.foot3 .fcols{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.foot3 .fcols>:last-child{grid-column:1/-1}}
+
+/* Pätička zmenšená: jeden řádek – podpis vlevo, tři skupiny vpravo */
+.foot3{padding-block:clamp(40px,4.4vw,64px) 22px}
+.foot3>.wrap{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,2fr);gap:28px clamp(32px,5vw,96px);align-items:start}
+.foot3 .sig{font-size:clamp(20px,1.7vw,26px);line-height:1.2;letter-spacing:-.02em;max-width:16ch}
+.foot3 .fcols{margin-top:0;gap:24px clamp(20px,3vw,48px)}
+.foot3 h2{margin-bottom:10px}
+.foot3 ul{font-size:14px;gap:6px}
+.foot3 .fbar{grid-column:1/-1;margin-top:clamp(24px,3vw,40px);padding-top:18px;font-size:12px}
+@media (max-width:860px){.foot3>.wrap{grid-template-columns:minmax(0,1fr)}}
+
+.foot3 .fcols{grid-column:1/-1;grid-template-columns:repeat(3,minmax(0,280px))}
+@media (max-width:720px){.foot3 .fcols{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+
+/* Kontakt: dvě cesty – nechat kontakt, nebo rovnou Silvie */
+.two{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:28px clamp(32px,5vw,88px);margin-top:clamp(28px,3vw,44px);align-items:start}
+.two form{margin-top:14px}
+.vl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.direct{position:relative;padding-left:clamp(24px,3vw,48px);border-left:1px solid var(--line2)}
+.who2{display:flex;align-items:center;gap:16px;margin-top:16px}
+.who2 .av{flex:none;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:#1a1716;color:var(--fg2);font-family:var(--mono);font-size:14px;letter-spacing:.08em;background-size:cover;background-position:center;filter:grayscale(1)}
+.who2 b{display:block;font-weight:400;font-size:clamp(20px,1.8vw,24px);color:var(--fg)}
+.who2 p{margin:4px 0 0;color:var(--fg2);font-size:15px}
+.dc{display:flex;flex-direction:column;gap:8px;margin:18px 0 0;font-size:clamp(18px,1.6vw,22px);font-weight:300}
+.dc a{color:var(--fg);text-decoration:none;border-bottom:1px solid var(--line2);align-self:flex-start;padding-bottom:2px}
+.dc a:hover{border-color:var(--red)}
+@media (max-width:860px){.two{grid-template-columns:minmax(0,1fr)}.direct{order:-1;padding-left:0;border-left:0;padding-bottom:24px;border-bottom:1px solid var(--line2)}}
+
+.who2 img.av{object-fit:cover;filter:grayscale(1) contrast(1.08) brightness(1.08)}
+
+.two .field label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.two .field input::placeholder{color:var(--mute)}
+
+/* Kontakt vystředěný: nadpis na střed, dvě rovnocenné cesty vedle sebe, uprostřed dělicí čára */
+.endc h2,.contact h2,.talk h3{text-align:center;margin-left:auto;margin-right:auto}
+.two{max-width:980px;margin-left:auto;margin-right:auto;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0;align-items:stretch;text-align:center}
+.two>.via,.two>.direct{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px clamp(20px,3vw,48px)}
+.two>.direct{border-left:1px solid var(--line2)}
+.two form{justify-content:center;margin-top:18px}
+.two .field{width:min(320px,100%)}
+.two .field input{text-align:center}
+.two .err,.two .thanks{text-align:center}
+.who2{flex-direction:column;gap:12px;margin-top:18px}
+.who2 .av{width:72px;height:72px}
+.dc{align-items:center;margin-top:14px}
+.dc a{align-self:center}
+.talk .more-pcd{text-align:center}
+@media (max-width:860px){.two{grid-template-columns:minmax(0,1fr);gap:28px}.two>.direct{border-left:0;border-bottom:1px solid var(--line2);padding-bottom:28px}}
+
+.two>.via,.two>.direct{justify-content:flex-start}
+.two>.via form{margin-top:44px}
+@media (max-width:860px){.two>.via form{margin-top:18px}}
+
+/* Kontakt B: Silvie jako hlavní postava – velká fotka vlevo, nadpis a přímý kontakt vpravo, formulář jako druhá možnost */
+.endc,.contact{text-align:left}
+.endc .wrap,.contact .wrap{display:grid;grid-template-columns:minmax(160px,260px) minmax(0,1fr);column-gap:clamp(28px,4vw,64px);align-items:center}
+.endc h2,.contact h2{grid-column:2;grid-row:1;text-align:left!important;margin:0!important;align-self:end}
+.talk2{display:contents}
+.av2{grid-column:1;grid-row:1/3;width:100%;aspect-ratio:1;object-fit:cover;border-radius:50%;filter:grayscale(1) contrast(1.08) brightness(1.05);box-shadow:0 0 0 1px rgba(234,231,224,.08),0 0 80px rgba(206,22,22,.25)}
+.t2{grid-column:2;grid-row:2;align-self:start;margin-top:clamp(18px,2vw,28px)}
+.who3{margin:0;font-size:clamp(18px,1.6vw,22px)}
+.who3 b{font-weight:400;color:var(--fg)}
+.who3 span{color:var(--fg2);margin-left:10px}
+.t2 .dc{flex-direction:row;flex-wrap:wrap;gap:8px 28px;margin-top:14px;align-items:baseline;font-size:clamp(20px,1.8vw,26px)}
+.t2 .dc a{align-self:auto}
+.via2{margin-top:clamp(28px,3vw,40px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line)}
+.via2 .vl{color:var(--mute)}
+.via2 form{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 18px;margin-top:10px;justify-content:flex-start}
+.via2 .field{width:min(320px,100%)}
+.via2 .field label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.via2 .field input{font-size:18px;text-align:left}
+.via2 .send{min-height:44px;font-size:14px;padding:0 20px;background:none;color:var(--fg);border:1px solid rgba(234,231,224,.45)}
+.via2 .send:hover{background:rgba(206,22,22,.12);border-color:var(--red)}
+/* jak.html: kontakt ve scéně */
+.talk{display:grid;grid-template-columns:minmax(140px,220px) minmax(0,1fr);column-gap:clamp(24px,3.4vw,56px);align-items:center}
+.talk>h3{grid-column:2;grid-row:1;text-align:left!important;margin:0!important;align-self:end}
+.talk .more-pcd{grid-column:1/-1;text-align:left!important}
+@media (max-width:720px){
+  .endc .wrap,.contact .wrap,.talk{grid-template-columns:96px minmax(0,1fr);column-gap:18px}
+  .av2{grid-row:1}
+  .t2{grid-column:1/-1;grid-row:2}
+  .endc h2,.contact h2,.talk>h3{align-self:center}
+}
+
+.via2{border-top:0;padding-top:0;margin-top:clamp(32px,3.4vw,48px)}
+.t2 .dc a{border-bottom-color:transparent}
+.t2 .dc a:hover{border-bottom-color:var(--red)}
+.who3 span{display:block;margin:4px 0 0;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+</style>
+</head>
+<body>
+
+
+<section class="stage" id="stage" aria-label="Úvod">
+  <canvas id="fx" aria-hidden="true"></canvas>
+  <div class="wrap top"><a href="index.html" aria-label="Court of Moravia, úvod" style="display:block"><img src="img/logo-full-white.svg" alt="Court of Moravia"></a><a class="talkpill" href="#kontakt">Promluvme si</a></div>
+
+  <div class="wrap inner">
+    <!-- 1: otázka -->
+    <div class="step" id="s1">
+      <h1>Kdo ve vaší firmě <em>doopravdy</em> rozhoduje?</h1>
+      <div class="opts" id="opts">
+        <button type="button" class="opt" id="o1" aria-pressed="false" data-r="Vzácné. A přesto vás něco bolí?">Ten, kdo má.</button>
+        <button type="button" class="opt" id="o2" aria-pressed="false" data-r="Pak jeden nese odpovědnost a druhý rozhoduje. To vytváří bolest.">Někdo jiný, než by měl.</button>
+        <button type="button" class="opt" id="o3" aria-pressed="false" data-r="Kde rozhoduje každý trochu, nerozhoduje doopravdy nikdo.">Každý trochu.</button>
+        <button type="button" class="opt" id="o4" aria-pressed="false" data-r="Upřímná odpověď. Bývá i ta nejdražší.">Vlastně nevím.</button>
+      </div>
+      <div class="reply" id="reply" hidden aria-live="polite">
+        <p id="replyText"></p>
+        <button type="button" class="next" id="to2">Dál <svg width="22" height="10" viewBox="0 0 22 10" aria-hidden="true"><path d="M0 5H20M16 1L20 5L16 9" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></button>
+      </div>
+    </div>
+
+    <!-- 2: seznam vět -->
+    <div class="step" id="s2" hidden>
+      <div class="head">
+        <h2>Která z těchto vět nejvíc vystihuje <em>vaši bolest</em>?</h2>
+      </div>
+      <div class="voices" id="cloud"></div>
+      <button type="button" class="ghost" id="back1" style="margin-top:24px">← Zpět k otázce</button>
+    </div>
+
+    <!-- 3: odpověď -->
+    <div class="step scene3" id="s3" hidden aria-live="polite">
+      <div id="s3in">
+        <p class="chosen r1" id="chosen"></p>
+        <p class="answer r2" id="answer"></p>
+        <div class="pcd r3" id="pcd">
+          <span class="eyebrow">Power Change Delivery</span>
+          <div class="bar">
+            <div class="seg" id="g0"><i></i><span>Zjistit proč</span></div>
+            <div class="seg" id="g1"><i></i><span>Navrhnout řešení</span></div>
+            <div class="seg" id="g2"><i></i><span>Zapracovat změnu</span></div>
+          </div>
+        </div>
+        <div class="acts r4">
+          <button type="button" class="send" id="talk">Promluvme si</button>
+          <form class="contact" id="form" novalidate hidden>
+            <div class="field">
+              <label for="kontaktIn">E-mail nebo telefon</label>
+              <input id="kontaktIn" name="kontakt" type="text" autocomplete="email" inputmode="email" placeholder="jmeno@firma.cz">
+            </div>
+            <button type="submit" class="send" id="sendBtn">Ozvěte se mi</button>
+          </form>
+          <p class="thanks" id="thanks" hidden>Děkujeme. Ozveme se vám.</p>
+          <button type="button" class="ghost" id="again">↺ Jiná bolest</button>
+          <a class="ghost" href="#jak" id="howLink">Jak to děláme →</a>
+        </div>
+        <p class="err" id="err" hidden>Zadejte prosím e-mail nebo telefonní číslo.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap foot">
+    <div class="ticks" aria-hidden="true"><i class="on" id="k1"></i><i id="k2"></i><i id="k3"></i></div>
+    <a class="ghost" href="power-change-delivery.html" id="skip">Přeskočit na metodiku →</a>
+  </div>
+</section>
+
+<section class="team" id="mistri" aria-labelledby="teamH">
+  <div class="wrap">
+    <h2 id="teamH">Kdo stojí za <em>oponou</em>?</h2>
+    <div class="people">
+      <div class="person"><img src="img/jezevec.jpg" alt=""><div><h3>Petr „Jezevec“ Pouchlý</h3><p>Business mentor, který desítky let učí, jak se firmy dělají správně.</p></div></div>
+      <div class="person"><img src="img/pepso.jpg" alt=""><div><h3>Peter „Pepso“ Horváth</h3><p>Stavitel firem a CEO. 20 let vede týmy, vystudovaný psycholog.</p></div></div>
+      <div class="person"><img src="img/smejko.jpg" alt=""><div><h3>Antonín „Smejko“ Novák</h3><p>Čte Matrix: vidí problém systému za pátým rohem.</p></div></div>
+      <div class="person"><img src="img/libor.jpg" alt=""><div><h3>Libor Komárek</h3><p>Pracovní psycholog a terapeut s doktorátem. Mění chování lidí i vedení.</p></div></div>
+      <div class="person"><img src="img/filip.jpg" alt=""><div><h3>Filip „Chart“ Gábor</h3><p>Facilitátor a expert na designové myšlení a přehled nad firmou.</p></div></div>
+      <div class="person"><img src="img/ciki.jpg" alt=""><div><h3>Petr „Čiki“ Kuběnský</h3><p>Staví prostředí, ve kterých lidé mění chování a baví je to.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="proof" aria-labelledby="prH">
+  <div class="wrap">
+    <h2 id="prH">Vložili v nás <em>důvěru</em>.</h2>
+    <ul class="names"><li class="b">LEGO</li> <li class="b">Komerční banka</li> <li class="b">T-Mobile</li> <li class="b">O2</li> <li class="b">AXA</li> <li class="b">Velux</li> <li class="b">Bilfinger</li> <li class="b">Notino</li> <li>Liftago</li> <li>IFE</li> <li>KROS</li> <li>STC</li> <li>Růžový Slon</li> <li>e.conomia</li> <li>Spondea</li> <li>Město Brno</li> <li>Lifefood</li> <li>Život 90</li> <li>Etnetera</li> <li>Grantika České spořitelny</li> <li>HA-SOFT</li> <li>Imago</li> <li>Alma Career</li> <li>Veracomp</li> <li>Centrum pasivního domu</li> <li>TIC Brno</li> <li>SDRUK</li> <li>Institut umění – Divadelní ústav</li> <li>Česká rada dětí a mládeže</li> <li>Mendelova univerzita v Brně</li> <li>BENU</li> <li>Safetica</li> <li>FK Servis</li> <li>NÚKIB</li></ul>
+    <dl class="more-names">
+      <div><dt>Partneři</dt><dd>CzechInvest · MPSV · MSIC · JIC · Brno Region · KPMG · Red Button · Yellow Couch · Podnikni to!</dd></div>
+      <div><dt>Akademická spolupráce</dt><dd>Masarykova univerzita · VŠE v Praze · VUT v Brně · Univerzita Tomáše Bati ve Zlíně</dd></div>
+    </dl>
+  </div>
+</section>
+<script>(function(){if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;var L=[].slice.call(document.querySelectorAll(".proof .names li"));if(!L.length)return;var last=-1;setInterval(function(){var i;do{i=Math.floor(Math.random()*L.length);}while(i===last&&L.length>1);if(last>-1)L[last].classList.remove("lit");L[i].classList.add("lit");last=i;},1600);})();</script>
+
+<section class="endc" id="kontakt" aria-labelledby="endH">
+  <img class="crown2" src="img/crown-white.svg" alt="" aria-hidden="true">
+  <div class="wrap">
+    <h2 id="endH"><em>Promluvme</em> si.</h2>
+    <div class="talk2">
+      <img class="av2" src="img/silvik.jpg" alt="Silvie Habartová">
+      <div class="t2">
+        <p class="who3"><b>Silvie Habartová</b><span>Mistryně prvního kontaktu</span></p>
+        <p class="dc"><a href="tel:+420733714754">+420 733 714 754</a><a href="mailto:silvik@courtofmoravia.com">silvik@courtofmoravia.com</a></p>
+        <div class="via2"><span class="vl">Nebo nám nechte kontakt</span>
+          <form id="form2" novalidate>
+        <div class="field"><label for="kontakt2">E-mail nebo telefon</label><input id="kontakt2" name="kontakt" type="text" autocomplete="email" inputmode="email" placeholder="E-mail nebo telefon"></div>
+        <button type="submit" class="send" id="send2">Ozvěte se mi</button>
+      </form>
+          <p class="err" id="err2" hidden>Zadejte prosím e-mail nebo telefonní číslo.</p>
+          <p class="thanks" id="thanks2" hidden>Děkujeme. Ozveme se vám.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="foot3">
+  <div class="wrap">
+    <div class="fcols">
+      <nav aria-label="Produkty"><h2>Produkty</h2><ul><li><a href="radix.html">Radix</a></li><li><a href="otium.html">Otium</a></li><li><a href="adwazir.html">Adwazir</a></li><li><a href="opus.html">Opus</a></li><li><a href="executive-experience.html">Executive Experience</a></li></ul></nav>
+      <nav aria-label="Metodika"><h2>Metodika</h2><ul><li><a href="power-change-delivery.html">Power Change Delivery</a></li><li><a href="pripady.html">Případové studie</a></li></ul></nav>
+      <div><h2>Kontakt</h2><ul><li><a href="mailto:info@courtofmoravia.com">info@courtofmoravia.com</a></li><li>Bartošova 3, Brno</li></ul></div>
+    </div>
+    <div class="fbar"><span><img src="img/crown-white.svg" alt="" aria-hidden="true">© 2026 Court of Moravia s.r.o. · IČ 02033950 · Od roku 2007</span><span><a href="#">Ochrana osobních údajů</a> · <a href="#">Cookies</a></span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* g = rozsvícené fáze Power Change Delivery (0 zjistit proč, 1 navrhnout řešení, 2 odpracovat změnu spolu); prázdné = mimo PCD */
+  var lines=[
+    {t:'Majitel mi mění rozhodnutí pod rukama.',p:'pcd',g:[0,1,2],a:'Pomůžeme vám s majitelem nastavit, kdo o čem rozhoduje. Tak, aby to platilo i za půl roku.'},
+    {t:'Najal jsem ředitele, ale práci pořád dělám já.',p:'pcd',g:[0,1,2],a:'Zjistíme, proč to pořád držíte vy, a pomůžeme vám předat řediteli skutečnou moc. Tak, abyste mu mohl věřit.'},
+    {t:'Na provoz máme čas vždycky. Na strategii skoro vůbec.',p:'otium',g:[2],a:'Vezmeme vás na pár dní pryč z provozu, abyste se nadechli a rozhodli, kam jdete. Vrátíte se se strategií.'},
+    {t:'Chybí mi strategický partner na otevřenou diskuzi.',p:'adwazir',g:[2],a:'Budeme vaším partnerem ve stínu. S námi můžete otevřeně probrat všechno, co jinde nemůžete.'},
+    {t:'Chci ve svém týmu něco změnit, ale nevím jak.',p:'executive-experience',g:[],a:'To „jak“ je naše práce. Řekněte nám, co má být jinak, a navrhneme zkušenost, která to v lidech změní. A když nevíte ani co, nejdřív to zjistíme.'},
+    {t:'Máme různé bolesti a chceme pomoc.',d:true,p:'pcd',g:[0,1,2],a:'Najdeme příčiny bolestí, navrhneme potřebná řešení a společně je u vás zapracujeme. Pokud ale budete chtít, po návrhu můžete pokračovat sami.'}
+  ];
+
+  /* klíčové slovo každé věty, ve scéně 3 červeně (pořadí jako lines) */
+  ['pod rukama','já','strategii','otevřenou','jak','pomoc'].forEach(function(k,i){if(lines[i])lines[i].k=k;});
+  /* kdo větu říká (podpis ve scéně 2) */
+  ['Ředitel','Majitel','Vedení','Lídr','Lídr týmu','Nebo zlatý standard'].forEach(function(w,i){if(lines[i])lines[i].who=w;});
+  /* kam vede „Jak to děláme“ */
+  ['reditel','majitel','vedeni','lidr','tym','standard'].forEach(function(id,i){if(lines[i])lines[i].id=id;});
+
+  var steps=[document.getElementById('s1'),document.getElementById('s2'),document.getElementById('s3')];
+  var k=[document.getElementById('k1'),document.getElementById('k2'),document.getElementById('k3')];
+  var glow=1,glowTo=1;
+  function go(n){
+    steps.forEach(function(s,i){s.hidden=(i!==n-1);});
+    k.forEach(function(t,i){t.classList.toggle('on',i<n);});
+    glowTo=n===3?1.7:1;
+  }
+
+  /* 1 */
+  var opts=document.getElementById('opts'),reply=document.getElementById('reply'),replyText=document.getElementById('replyText');
+  var optBtns=[].slice.call(opts.querySelectorAll('.opt'));
+  optBtns.forEach(function(b){
+    b.addEventListener('click',function(){
+      opts.classList.add('done');
+      optBtns.forEach(function(o){o.setAttribute('aria-pressed',o===b?'true':'false');});
+      replyText.textContent=b.dataset.r;
+      reply.hidden=false;replyText.classList.remove('fade');void replyText.offsetWidth;replyText.classList.add('fade');
+    });
+  });
+  document.getElementById('to2').addEventListener('click',function(){go(2);});
+  document.getElementById('back1').addEventListener('click',function(){go(1);});
+
+  /* 2 */
+  var cloud=document.getElementById('cloud'),btns=[];
+  lines.forEach(function(l,i){
+    var b=document.createElement('button');b.type='button';b.id='v'+(i+1);if(l.d)b.className='gold';
+    var w=document.createElement('span');w.className='who';w.textContent=l.who;
+    var q=document.createElement('span');q.className='q';var at=l.t.lastIndexOf(l.k);
+    q.append(l.t.slice(0,at));var em=document.createElement('em');em.textContent=l.k;q.append(em,l.t.slice(at+l.k.length));
+    b.append(w,q);
+    b.addEventListener('click',function(){pick(l,b);});
+    cloud.appendChild(b);btns.push(b);
+  });
+
+  /* 3 */
+  var s3in=document.getElementById('s3in'),chosen=document.getElementById('chosen'),answer=document.getElementById('answer');
+  var pcd=document.getElementById('pcd'),segs=[0,1,2].map(function(i){return document.getElementById('g'+i);});
+  var how=document.getElementById('howLink');
+  function pick(l,b){
+    btns.forEach(function(x){x.classList.toggle('was',x===b);});
+    chosen.textContent='';var at=l.k?l.t.lastIndexOf(l.k):-1;
+    if(at<0){chosen.textContent='„'+l.t+'“';}
+    else{chosen.appendChild(document.createTextNode('„'+l.t.slice(0,at)));var em=document.createElement('em');em.textContent=l.k;chosen.appendChild(em);chosen.appendChild(document.createTextNode(l.t.slice(at+l.k.length)+'“'));}answer.textContent=l.a;how.dataset.page=l.p;how.setAttribute('href','jak.html#'+l.id);
+    pcd.hidden=!l.g.length;pcd.classList.remove('go');
+    segs.forEach(function(s,i){s.classList.toggle('on',l.g.indexOf(i)>-1);});
+    /* restart the staged reveal */
+    var c=s3in.cloneNode(true);s3in.parentNode.replaceChild(c,s3in);s3in=c;rebind();
+    go(3);window.scrollTo({top:0,behavior:reduce?'auto':'smooth'});
+    requestAnimationFrame(function(){requestAnimationFrame(function(){document.getElementById('pcd').classList.add('go');});});
+  }
+
+  function rebind(){
+    chosen=document.getElementById('chosen');answer=document.getElementById('answer');pcd=document.getElementById('pcd');
+    segs=[0,1,2].map(function(i){return document.getElementById('g'+i);});how=document.getElementById('howLink');
+    var talk=document.getElementById('talk'),form=document.getElementById('form'),inp=document.getElementById('kontaktIn'),err=document.getElementById('err'),thanks=document.getElementById('thanks');
+    talk.addEventListener('click',function(){talk.hidden=true;form.hidden=false;form.classList.add('fade');inp.focus();});
+    form.addEventListener('submit',function(e){
+      e.preventDefault();
+      var v=inp.value.trim(),email=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v),phone=/^\+?[\d\s()-]{9,}$/.test(v);
+      if(!email&&!phone){err.hidden=false;inp.focus();return;}
+      err.hidden=true;form.hidden=true;thanks.hidden=false;
+    });
+    document.getElementById('again').addEventListener('click',function(){go(2);});
+  }
+  rebind();
+  /* návrat z „Jak to děláme“ → rovnou na výběr bolesti */
+  if(location.hash==='#bolest'){go(2);}
+
+  /* kouř v pozadí; při odpovědi se rozzáří */
+  var cv=document.getElementById('fx'),cx=cv.getContext('2d'),W=1,H=1,last=0;
+  var blobs=[{x:.20,y:.28,r:.55,c:'206,22,22',a:.16,sx:.00011,sy:.00007,p:0},{x:.80,y:.66,r:.50,c:'160,14,14',a:.14,sx:.00008,sy:.00012,p:2},{x:.52,y:.14,r:.36,c:'234,231,224',a:.03,sx:.00013,sy:.00009,p:4}];
+  function size(){var r=cv.getBoundingClientRect();W=Math.max(1,Math.round(r.width*.5));H=Math.max(1,Math.round(r.height*.5));cv.width=W;cv.height=H;}
+  function draw(t){
+    cx.globalCompositeOperation='source-over';cx.fillStyle='#050505';cx.fillRect(0,0,W,H);
+    cx.globalCompositeOperation='lighter';var m=Math.max(W,H);
+    blobs.forEach(function(b){var x=(b.x+Math.sin(t*b.sx+b.p)*.12)*W,y=(b.y+Math.cos(t*b.sy+b.p)*.10)*H,r=b.r*m*(1+Math.sin(t*.00017+b.p)*.08);var a=Math.min(.5,b.a*glow);var g=cx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,'rgba('+b.c+','+a.toFixed(3)+')');g.addColorStop(1,'rgba('+b.c+',0)');cx.fillStyle=g;cx.fillRect(0,0,W,H);});
+    cx.globalCompositeOperation='source-over';
+  }
+  size();draw(0);
+  if('ResizeObserver' in window){new ResizeObserver(function(){size();draw(performance.now());}).observe(cv);}
+  else window.addEventListener('resize',function(){size();draw(performance.now());});
+  if(!reduce){(function loop(t){glow+=(glowTo-glow)*.02;if(t-last>33){last=t;var r=cv.getBoundingClientRect();if(r.bottom>0)draw(t);}requestAnimationFrame(loop);})(0);}
+
+  /* závěrečný kontakt */
+  (function(){var f=document.getElementById('form2'),i=document.getElementById('kontakt2'),e=document.getElementById('err2'),t=document.getElementById('thanks2');
+    f.addEventListener('submit',function(ev){ev.preventDefault();var v=i.value.trim(),ok=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)||/^\+?[\d\s()-]{9,}$/.test(v);
+      if(!ok){e.hidden=false;i.focus();return;}e.hidden=true;f.hidden=true;t.hidden=false;});})();
+})();
+</script>
+
+</body>
+</html>
