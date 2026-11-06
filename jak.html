@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Court of Moravia – Jak to děláme</title>
-<meta name="description" content="Většina bolestí ve firmě má jednu příčinu: moc, která neteče, jak má. Power Change Delivery je metoda Court of Moravia, aby moc ve firmě tekla, jak má.">
+<meta name="description" content="Většina bolestí ve firmě má jednu příčinu: moc, která neproudí, jak má. Power Change Delivery je metoda Court of Moravia, aby moc ve firmě proudila, jak má.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500&family=Geist+Mono:wght@400&display=swap">
 <link rel="stylesheet" href="produkt.css">
@@ -138,6 +138,11 @@ a.stepc:hover .go{border-color:var(--red)}
 .more-pcd{margin:clamp(28px,3vw,40px) 0 0;font-size:15px;color:var(--mute)}
 .more-pcd a{color:var(--fg2);text-decoration:none;border-bottom:1px solid var(--line2);margin-left:4px}
 .more-pcd a:hover{color:var(--fg);border-color:var(--red)}
+
+/* Navigace jako na úvodu: scény pod sebou, volný scroll, šipka dole, tečky vpravo */
+.scene{padding-block:clamp(110px,11vw,150px) clamp(110px,11vw,140px)}
+.scene .down.at{position:absolute}
+@media (max-width:860px){.scene{padding-block:110px 110px}}
 </style>
 </head>
 <body>
@@ -146,45 +151,66 @@ a.stepc:hover .go{border-color:var(--red)}
   <nav aria-label="Navigace"><a class="ghost" href="index.html#bolest">← Jiná bolest</a><button type="button" class="talkpill" data-scroll="kontakt">Promluvme si</button></nav></div>
 
 <main class="stage">
-  <nav class="crumbs" aria-label="Kroky"><div class="wrap" id="crumbs"></div></nav>
+  <nav class="sdots" id="sdots" aria-label="Části stránky"><a href="#sc1" data-go="1" aria-label="Proč to bolí"></a><a href="#sc2" data-go="2" aria-label="Jak to děláme"></a><a href="#sc3" data-go="3" aria-label="Začali bychom tady"></a></nav>
 
   <section class="scene" id="sc1" aria-labelledby="h1x">
     <div class="wrap s1">
       <div class="t">
-        <h2 id="h1x">Většina bolestí ve firmě má jednu příčinu: moc, která <em>neteče, jak má</em>.</h2>
+        <h2 id="h1x">Většina bolestí ve firmě má jednu příčinu: moc, která <em>neproudí, jak má</em>.</h2>
         <p class="lead">Jako krev v těle: když se někde zasekne, bolí to úplně jinde. <span class="you" id="cap"></span></p>
       </div>
-        <div class="act"><button type="button" class="next" data-go="next">Dál <svg width="22" height="10" viewBox="0 0 22 10" aria-hidden="true"><path d="M0 5H20M16 1L20 5L16 9" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></button><button type="button" class="ghost" data-go="last">Rovnou k doporučení</button></div>
-      <figure class="organism" style="margin:0"><canvas class="viz" id="flowCv" data-viz="flow" data-case="free" data-live="1" role="img" aria-label="Moc ve firmě teče od majitele přes ředitele a vedení k týmu."></canvas>
+      <figure class="organism" style="margin:0"><canvas class="viz" id="flowCv" data-viz="flow" data-case="free" data-live="1" role="img" aria-label="Moc ve firmě proudí od majitele přes ředitele a vedení k týmu."></canvas>
       </figure>
     </div>
-  </section>
+      <a class="down at bob" href="#" data-go="next" aria-label="Pokračovat"><svg width="16" height="22" viewBox="0 0 16 22" aria-hidden="true"><path d="M8 0V20M1 13L8 20L15 13" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></a>
+</section>
 
-  <section class="scene" id="sc2" aria-labelledby="h2x" hidden>
+  <section class="scene" id="sc2" aria-labelledby="h2x">
     <div class="wrap">
       <h2 id="h2x">Jak to <em>děláme</em>.</h2>
-      <p class="lead"><a class="inl" href="power-change-delivery.html">Power Change Delivery</a> je naše metoda, aby moc ve firmě tekla, jak má. <span id="mLead2">Projdeme spolu všechny tři kroky. V návrhu vybereme z našich nástrojů přesně to, co váš případ potřebuje, a ve třetím kroku to u vás zapracujeme.</span></p>
+      <p class="lead"><a class="inl" href="power-change-delivery.html">Power Change Delivery</a> je naše metoda, aby moc ve firmě proudila, jak má. <span id="mLead2">Projdeme spolu všechny tři kroky. V návrhu vybereme z našich nástrojů přesně to, co váš případ potřebuje, a ve třetím kroku to u vás zapracujeme.</span></p>
       <div class="pline"><canvas class="viz" id="lineCv" data-viz="pcdline" data-on="0,1,2" data-live="1" aria-hidden="true"></canvas></div>
       <div class="phases">
-        <div class="ph" id="ph0"><i></i><h3>Zjistit proč</h3><p id="w0"></p><span class="dur" id="t0"></span></div>
-        <div class="ph" id="ph1"><i></i><h3>Navrhnout řešení</h3><p id="w1"></p><span class="dur" id="t1"></span></div>
-        <div class="ph" id="ph2"><i></i><h3>Zapracovat změnu</h3><p id="w2"></p><span class="dur" id="t2"></span></div>
+        <div class="ph" id="ph0"><i></i><h3>Skica</h3><p id="w0"></p><span class="dur" id="t0"></span></div>
+        <div class="ph" id="ph1"><i></i><h3>Návrh</h3><p id="w1"></p><span class="dur" id="t1"></span></div>
+        <div class="ph" id="ph2"><i></i><h3>Stavba</h3><p id="w2"></p><span class="dur" id="t2"></span></div>
       </div>
       <div class="span" id="span" aria-label="Rozsah cesty"></div>
-      <div class="act"><button type="button" class="next" data-go="next">Dál <svg width="22" height="10" viewBox="0 0 22 10" aria-hidden="true"><path d="M0 5H20M16 1L20 5L16 9" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></button></div>
     </div>
-  </section>
+      <a class="down at" href="#" data-go="next" aria-label="Pokračovat"><svg width="16" height="22" viewBox="0 0 16 22" aria-hidden="true"><path d="M8 0V20M1 13L8 20L15 13" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></a>
+</section>
 
-  <section class="scene" id="sc3" aria-labelledby="h3x" hidden>
+  <section class="scene" id="sc3" aria-labelledby="h3x">
     <div class="wrap">
       <h2 id="h3x">Začali bychom <em>tady</em>.</h2>
       <div class="route" id="route"></div>
-      <div class="act"><button type="button" class="next" data-scroll="kontakt">Promluvme si <svg width="10" height="14" viewBox="0 0 10 14" aria-hidden="true"><path d="M5 0V12M1 8L5 12L9 8" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></button></div>
+      <div class="act"><a class="send" href="#kontakt" data-scroll="kontakt">Promluvme si ↓</a></div>
       <p class="more-pcd" id="morePcd">Chcete nejdřív vědět víc o tom, jak pracujeme? <a href="power-change-delivery.html">Power Change Delivery →</a></p>
     </div>
   </section>
 </main>
 
+<section class="contact" id="kontakt" aria-labelledby="ctH">
+  <img class="crown" src="img/crown-white.svg" alt="" aria-hidden="true">
+  <div class="wrap">
+    <h2 id="ctH"><em>Promluvme</em> si.</h2>
+    <div class="talk2">
+      <img class="av2" src="img/silvik.jpg" alt="Silvie Habartová">
+      <div class="t2">
+        <p class="who3"><b>Silvie Habartová</b><span>Mistryně prvního kontaktu</span></p>
+        <p class="dc"><a href="tel:+420733714754">+420 733 714 754</a><a href="mailto:silvik@courtofmoravia.com">silvik@courtofmoravia.com</a></p>
+        <div class="via2"><span class="vl">Nebo nám nechte kontakt</span>
+          <form id="form" novalidate>
+        <div class="field"><label for="kontaktIn">E-mail nebo telefon</label><input id="kontaktIn" name="kontakt" type="text" autocomplete="email" inputmode="email" placeholder="E-mail nebo telefon"></div>
+        <button type="submit" class="send" id="sendBtn">Ozvěte se mi</button>
+      </form>
+          <p class="err" id="err" hidden>Zadejte prosím e-mail nebo telefonní číslo.</p>
+          <p class="thanks" id="thanks" hidden>Děkujeme. Ozveme se vám.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 <section class="team" aria-labelledby="teamH">
   <div class="wrap">
     <h2 id="teamH">Kdo stojí za <em>oponou</em>?</h2>
@@ -211,35 +237,16 @@ a.stepc:hover .go{border-color:var(--red)}
 </section>
 <script>(function(){if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;var L=[].slice.call(document.querySelectorAll(".proof .names li"));if(!L.length)return;var last=-1;setInterval(function(){var i;do{i=Math.floor(Math.random()*L.length);}while(i===last&&L.length>1);if(last>-1)L[last].classList.remove("lit");L[i].classList.add("lit");last=i;},1600);})();</script>
 
-<section class="contact" id="kontakt" aria-labelledby="ctH">
-  <img class="crown" src="img/crown-white.svg" alt="" aria-hidden="true">
-  <div class="wrap">
-    <h2 id="ctH"><em>Promluvme</em> si.</h2>
-    <div class="talk2">
-      <img class="av2" src="img/silvik.jpg" alt="Silvie Habartová">
-      <div class="t2">
-        <p class="who3"><b>Silvie Habartová</b><span>Mistryně prvního kontaktu</span></p>
-        <p class="dc"><a href="tel:+420733714754">+420 733 714 754</a><a href="mailto:silvik@courtofmoravia.com">silvik@courtofmoravia.com</a></p>
-        <div class="via2"><span class="vl">Nebo nám nechte kontakt</span>
-          <form id="form" novalidate>
-        <div class="field"><label for="kontaktIn">E-mail nebo telefon</label><input id="kontaktIn" name="kontakt" type="text" autocomplete="email" inputmode="email" placeholder="E-mail nebo telefon"></div>
-        <button type="submit" class="send" id="sendBtn">Ozvěte se mi</button>
-      </form>
-          <p class="err" id="err" hidden>Zadejte prosím e-mail nebo telefonní číslo.</p>
-          <p class="thanks" id="thanks" hidden>Děkujeme. Ozveme se vám.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+
 
 <footer class="foot3">
   <div class="wrap">
     <div class="fcols">
-      <nav aria-label="Produkty"><h2>Produkty</h2><ul><li><a href="radix.html">Radix</a></li><li><a href="otium.html">Otium</a></li><li><a href="adwazir.html">Adwazir</a></li><li><a href="opus.html">Opus</a></li><li><a href="executive-experience.html">Executive Experience</a></li></ul></nav>
+      <nav aria-label="Produkty"><h2>Produkty</h2><ul><li><a href="pudorys.html">Půdorys</a></li><li><a href="dilo.html">Dílo</a></li><li><a href="vezir.html">Vezír</a></li><li><a href="vyjezd.html">Výjezd</a></li><li><a href="manazerska-zkusenost.html">Manažerská zkušenost</a></li></ul></nav>
       <nav aria-label="Metodika"><h2>Metodika</h2><ul><li><a href="power-change-delivery.html">Power Change Delivery</a></li><li><a href="pripady.html">Případové studie</a></li></ul></nav>
       <div><h2>Kontakt</h2><ul><li><a href="mailto:info@courtofmoravia.com">info@courtofmoravia.com</a></li><li>Bartošova 3, Brno</li></ul></div>
     </div>
+    <p class="motto">Odpovědnost bez moci nefunguje. Moc bez odpovědnosti taky ne.</p>
     <div class="fbar"><span><img src="img/crown-white.svg" alt="" aria-hidden="true">© 2026 Court of Moravia s.r.o. · IČ 02033950 · Od roku 2007</span><span><a href="#">Ochrana osobních údajů</a> · <a href="#">Cookies</a></span></div>
   </div>
 </footer>
@@ -252,7 +259,7 @@ a.stepc:hover .go{border-color:var(--red)}
     {w:'Z verdiktu navrhneme, kdo má o čem rozhodovat a co se musí změnit.',t:'2–3 týdny'},
     {w:'Změnu s vámi odpracujeme, dokud nezačne držet sama.',t:'3–6 měsíců'}
   ];
-  var PROD={radix:['radix.html','Radix','radix','Víc o Radixu'],adwazir:['adwazir.html','Adwazir','adwazir','Víc o Adwaziru'],opus:['opus.html','Opus','opus','Víc o Opusu'],otium:['otium.html','Otium','otium','Víc o Otiu'],ee:['executive-experience.html','Executive Experience','ee','Víc o Executive Experience']};
+  var PROD={radix:['pudorys.html','Půdorys','radix','Víc o Půdorysu'],adwazir:['vezir.html','Vezír','adwazir','Víc o Vezírovi'],opus:['dilo.html','Dílo','opus','Víc o Díle'],otium:['vyjezd.html','Výjezd','otium','Víc o Výjezdu'],ee:['manazerska-zkusenost.html','Manažerská zkušenost','ee','Víc o Manažerské zkušenosti']};
   var P={
     reditel:{who:'Ředitel',t:'Majitel mi mění rozhodnutí pod rukama.',k:'pod rukama',flow:'clot',b:'rozdel',cap:'U vás se moc zasekává mezi majitelem a ředitelem.',g:[0,1,2],
       route:[['radix','Nejdřív zjistíme, kde přesně se moc mezi vámi a majitelem zasekává, a navrhneme, kdo má o čem rozhodovat.'],['adwazir','Pak s vámi bude strategický partner ve stínu, dokud nový mandát nezačne platit.']]},
@@ -264,10 +271,10 @@ a.stepc:hover .go{border-color:var(--red)}
     lidr:{who:'Lídr',t:'Chybí mi strategický partner na otevřenou diskuzi.',k:'otevřenou',flow:'one',b:'',cap:'U vás se všechno hromadí u jednoho člověka. Jak dlouho se to dá zvládat sám?',g:[2],
       p2:{w:'Budeme vaším strategickým partnerem ve stínu. Radíme jen vám, za vás před vaše lidi nevystupujeme.',t:'Od 3 měsíců'},
       route:[['adwazir','Budeme vaším strategickým partnerem ve stínu. S námi můžete otevřeně probrat všechno, co jinde nemůžete.']]},
-    tym:{who:'Lídr týmu',t:'Chci ve svém týmu něco změnit, ale nevím jak.',k:'jak',flow:'free',b:'',cap:'Zkušenost, která v lidech něco změní, jim musí ukázat, kudy u vás moc teče, když jde do tuhého.',g:[],
+    tym:{who:'Lídr týmu',t:'Chci ve svém týmu něco změnit, ale nevím jak.',k:'jak',flow:'free',b:'',cap:'Zkušenost, která v lidech něco změní, jim musí ukázat, kudy u vás moc proudí, když jde do tuhého.',g:[],
       route:[['ee','To „jak“ je naše práce. Řekněte nám, co má být jinak, a navrhneme zkušenost, která to v lidech změní. A když nevíte ani co, nejdřív to zjistíme. Vybrat můžete i z katalogu: Via Legata, XPactum, IMPACT, Karavana, Tribunál, Sestup.']]},
     standard:{who:'Zlatý standard',t:'Máme různé bolesti a chceme pomoc.',k:'pomoc',flow:'fog',b:'',cap:'Bolí vás různé věci, tlak roste a není jasné, kde se moc zasekává. Proto začínáme otázkou proč.',g:[0,1,2],
-      route:[['radix','Nejdřív zjistíme, proč se problémy vracejí, a navrhneme řešení.'],['verdikt','Pak podle toho, co ukáže verdikt: změnu odpracujeme s vašimi lidmi (<a href="opus.html">Opus</a>), budeme vaším partnerem ve stínu (<a href="adwazir.html">Adwazir</a>), nebo vezmeme vedení na výjezd (<a href="otium.html">Otium</a>).']]}
+      route:[['radix','Nejdřív zjistíme, proč se problémy vracejí, a navrhneme řešení.'],['verdikt','Pak podle toho, co ukáže verdikt: změnu odpracujeme s vašimi lidmi (<a href="dilo.html">Dílo</a>), budeme vaším partnerem ve stínu (<a href="vezir.html">Vezír</a>), nebo vezmeme vedení na výjezd (<a href="vyjezd.html">Výjezd</a>).']]}
   };
   var NAMES={1:'Proč to bolí',2:'Jak to děláme',3:'Začali bychom tady'};
   var key=null,cur=1;
@@ -286,32 +293,36 @@ a.stepc:hover .go{border-color:var(--red)}
     if(p.g.length){$('lineCv').dataset.on=p.g.join(',');$('mLead2').textContent=p.g.length===3?'Projdeme spolu všechny tři kroky. V návrhu vybereme z našich nástrojů přesně to, co váš případ potřebuje, a ve třetím kroku to u vás zapracujeme.':'Ve vašem případě začínáme rovnou třetím krokem. První dva projdeme, jen když bude potřeba jít hlouběji.';
       [0,1,2].forEach(function(i){var d=(i===2&&p.p2)?p.p2:base[i];$('w'+i).textContent=d.w;$('t'+i).textContent=d.t;$('ph'+i).classList.toggle('on',p.g.indexOf(i)>-1);});
       $('span').innerHTML=p.g.length===3
-        ?'<div class="br" style="grid-column:1/4;grid-row:1"></div><div class="fork" style="grid-column:3;grid-row:1"></div>'
+        ?'<div class="br" style="grid-column:1/4;grid-row:1"></div>'
          +'<p class="lbl" style="grid-column:1/3;grid-row:2"><b>Zlatý standard</b>Celou cestu projdeme spolu.</p>'
-         +'<p class="side" style="grid-column:3;grid-row:2">Po návrhu můžete pokračovat i sami.</p>'
         :'<div class="br dim" style="grid-column:1/3;grid-row:1"></div><div class="br" style="grid-column:3;grid-row:1"></div>'
          +'<p class="lbl dim" style="grid-column:1/3;grid-row:2"><b>Když bude potřeba</b>Projdeme i první dvě fáze.</p>'
          +'<p class="lbl" style="grid-column:3;grid-row:2"><b>Pro váš případ</b>Začínáme rovnou u změny.</p>';}
     var box=$('route'),n=p.route.length;box.innerHTML='';box.className='route'+(n===1?' one':'');
     p.route.forEach(function(r,i){if(i){var l=document.createElement('div');l.className='link';l.setAttribute('aria-hidden','true');l.innerHTML='<svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 1L5 5L1 9" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';box.appendChild(l);}box.appendChild(stepCard(r,i,n));});
-    var cr=$('crumbs');cr.innerHTML='';steps().forEach(function(s){var b=document.createElement('button');b.type='button';b.dataset.go=String(s);b.innerHTML='<i></i><span>'+NAMES[s]+'</span>';b.setAttribute('aria-label',NAMES[s]);cr.appendChild(b);});
+    $('sc2').hidden=!p.g.length;[].forEach.call($('sdots').children,function(a){a.hidden=steps().indexOf(+a.dataset.go)<0;});
     document.title='Court of Moravia – '+p.who;
   }
+  var first=true;
   function show(n){
     var st=steps();if(st.indexOf(n)<0)n=st[0];cur=n;
-    [1,2,3].forEach(function(s){var sc=$('sc'+s),on=s===n;sc.hidden=!on;sc.classList.remove('show');if(on){void sc.offsetWidth;sc.classList.add('show');}});
-    [].forEach.call($('crumbs').children,function(b){var s=+b.dataset.go;b.toggleAttribute('aria-current',false);if(s===n)b.setAttribute('aria-current','step');b.classList.toggle('done',st.indexOf(s)<st.indexOf(n));});
-    window.scrollTo(0,0);
+    var sc=$('sc'+n);if(!(first&&n===1)){sc.scrollIntoView({behavior:first?'auto':'smooth'});if(first)window.addEventListener('load',function(){sc.scrollIntoView({behavior:'auto'});});}first=false;
     if(window.CoMViz){window.CoMViz.scan();requestAnimationFrame(function(){window.CoMViz.refresh($('flowCv'));window.CoMViz.refresh($('lineCv'));});}
   }
   function go(n){var h='#'+key+(n>1?'/'+n:'');if(location.hash!==h)location.hash=h;else show(n);}
   document.addEventListener('click',function(e){var b=e.target.closest('[data-scroll]');if(!b)return;var t=document.getElementById(b.dataset.scroll);if(t)t.scrollIntoView({behavior:'smooth'});});
   document.addEventListener('click',function(e){var b=e.target.closest('[data-go]');if(!b)return;var g=b.dataset.go,st=steps(),i=st.indexOf(cur);
-    var n=g==='next'?st[Math.min(st.length-1,i+1)]:g==='prev'?st[Math.max(0,i-1)]:g==='last'?3:+g;go(n);
+    e.preventDefault();var n=g==='next'?st[Math.min(st.length-1,i+1)]:g==='prev'?st[Math.max(0,i-1)]:g==='last'?3:+g;go(n);
   });
   function route(){var h=location.hash.slice(1).split('/'),k=h[0];if(!P[k])return false;var n=+h[1]||1;if(k!==key){key=k;fill();}show(n);return true;}
   window.addEventListener('hashchange',route);
   if(!route()){key='standard';fill();show(1);}
+  /* aktivní scéna podle scrollu: tečky vpravo a výchozí bod pro šipku */
+  if('IntersectionObserver' in window){var dots=[].slice.call($('sdots').children);
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;var n=+e.target.id.slice(2);cur=n;dots.forEach(function(d){d.setAttribute('aria-current',+d.dataset.go===n?'true':'false');});});},{threshold:.45});
+    [1,2,3].forEach(function(n){io.observe($('sc'+n));});}
+  var sdn=$('sdots'),kt=$('kontakt');function sdf(){var r=kt.getBoundingClientRect().top/innerHeight,o=Math.max(0,Math.min(1,(r-.35)/.4));sdn.style.opacity=o.toFixed(3);sdn.style.visibility=o<.02?'hidden':'visible';}
+  window.addEventListener('scroll',sdf,{passive:true});sdf();
 
   var form=$('form'),inp=$('kontaktIn');
   form.addEventListener('submit',function(e){e.preventDefault();var v=inp.value.trim(),ok=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)||/^\+?[\d\s()-]{9,}$/.test(v);
