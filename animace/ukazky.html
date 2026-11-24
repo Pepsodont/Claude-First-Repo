@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Animace CoM – ukázky</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500&family=Geist+Mono:wght@400&display=swap">
+<style>
+:root{--bg:#050505;--fg:#eae7e0;--fg2:rgba(234,231,224,.72);--mute:rgba(234,231,224,.45);--line:rgba(234,231,224,.12);--red:#ce1616;--mono:"Geist Mono",ui-monospace,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:300 16px/1.55 "Inter Tight",system-ui,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+header{padding:56px 0 24px;border-bottom:1px solid var(--line)}
+h1{font-weight:300;font-size:clamp(32px,5vw,56px);letter-spacing:-.03em;margin:0 0 12px}
+h1 em,h2 em{font-style:normal;color:var(--red)}
+h2{font-weight:300;font-size:clamp(24px,3vw,34px);letter-spacing:-.02em;margin:0 0 8px}
+h3{font-family:var(--mono);font-weight:400;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin:0 0 10px}
+p{color:var(--fg2);max-width:72ch;margin:0 0 12px}
+section{padding:48px 0;border-bottom:1px solid var(--line)}
+.box{position:relative;border:1px solid var(--line);background:#000;overflow:hidden}
+canvas.viz,#fx{display:block;width:100%}
+.h-hero{height:clamp(260px,40vw,440px)}
+.h-flow{aspect-ratio:1.3/1;max-height:560px}
+.h-line{height:150px}
+.h-steps{height:90px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:20px;margin-top:20px}
+.grid .h-flow{aspect-ratio:4/3}
+.card{display:block;color:inherit;text-decoration:none}
+.card .box{height:200px}
+.cap{font-family:var(--mono);font-size:12px;color:var(--mute);margin:8px 0 0}
+.cap b{color:var(--fg);font-weight:400}
+pre{margin:12px 0 0;padding:12px 14px;background:#0d0c0c;border:1px solid var(--line);overflow-x:auto;font:12px/1.6 var(--mono);color:var(--fg2);white-space:pre}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0 0}
+button{font:400 13px var(--mono);color:var(--fg);background:transparent;border:1px solid var(--line);padding:7px 12px;cursor:pointer;border-radius:999px}
+button[aria-pressed="true"]{border-color:var(--red);color:#fff;background:rgba(206,22,22,.18)}
+.q{font-size:clamp(18px,2vw,22px);color:var(--fg);margin:12px 0 0;min-height:2.4em}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <h1>Animace <em>CoM</em></h1>
+  <p>Všechny animace z prototypu webu Court of Moravia (artefakt „Court of Moravia – Zrcadlo“, verze 126). Nejsou to videa ani obrázky: kreslí je kód do elementu <code>&lt;canvas&gt;</code>. Stačí na stránku přidat <code>vizual.js</code>, případně <code>pozadi.js</code>, a canvas s příslušnými atributy. Návod najdeš v README.md ve stejné složce.</p>
+</div></header>
+
+<section><div class="wrap">
+  <h3>pozadi.js · homepage, celý úvod</h3>
+  <h2>Kouř v <em>pozadí</em></h2>
+  <p>Na webu je canvas <code>position:fixed</code> přes celou obrazovku pod obsahem úvodu. Když návštěvník vybere bolest, kouř se rozzáří; na obrazovce „Tři kroky“ ještě víc. Za úvodem stránka canvas plynule zprůhlední (<code>style.opacity</code>); při opacity 0 se nekreslí.</p>
+  <div class="box h-hero"><canvas id="fx" class="h-hero" aria-hidden="true"></canvas></div>
+  <div class="ctl" id="glowCtl">
+    <button type="button" data-g="1" aria-pressed="true">setGlow(1) · klid</button>
+    <button type="button" data-g="1.35" aria-pressed="false">setGlow(1.35) · po výběru bolesti</button>
+    <button type="button" data-g="1.6" aria-pressed="false">setGlow(1.6) · Tři kroky</button>
+  </div>
+<pre>&lt;canvas id="fx" aria-hidden="true"&gt;&lt;/canvas&gt;
+&lt;script src="pozadi.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  var pozadi = CoMPozadi(document.getElementById('fx'));
+  // po výběru bolesti:      pozadi.setGlow(1.35);
+  // obrazovka „Tři kroky“:  pozadi.setGlow(1.6);
+&lt;/script&gt;</pre>
+</div></section>
+
+<section><div class="wrap">
+  <h3>vizual.js · data-viz="flow" · homepage, obrazovka „Příčina“</h3>
+  <h2>Tok moci podle <em>bolesti</em></h2>
+  <p>Moc proudí od majitele přes ředitele a vedení k týmu. Každá z pěti bolestí má vlastní režim (<code>data-case</code>). Na webu se přepíná šipkami, tečkami nebo tahem prstem a předvybere se podle bolesti, kterou návštěvník zvolil. Po změně <code>data-case</code> je nutné zavolat <code>CoMViz.refresh(canvas)</code>.</p>
+  <div class="box"><canvas class="viz h-flow" id="whyCv" data-viz="flow" data-case="clot" data-live="1" role="img" aria-label="Moc proudí od majitele přes ředitele a vedení k týmu a zasekává se tam, kde to bolí."></canvas></div>
+  <p class="q" id="pq"></p>
+  <div class="ctl" id="painCtl"></div>
+<pre>&lt;canvas class="viz" id="whyCv" data-viz="flow" data-case="clot" data-live="1"&gt;&lt;/canvas&gt;
+&lt;script src="vizual.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  // přepnutí na jinou bolest:
+  var cv = document.getElementById('whyCv');
+  cv.dataset.case = 'scatter';
+  CoMViz.refresh(cv);
+&lt;/script&gt;</pre>
+</div></section>
+
+<section><div class="wrap">
+  <h3>vizual.js · data-viz="flow" · všechny režimy</h3>
+  <h2>Všechny režimy <em>toku</em></h2>
+  <p>Kromě pěti bolestí: <code>free</code> je zdravý stav (homepage, „Nechcete jinou firmu…“, tam bez popisků přes <code>data-labels="0"</code>), <code>fog</code> je stránka Power Change Delivery a <code>loop</code> je jedna z případových studií. Popisky MAJITEL / ŘEDITEL / VEDENÍ / TÝM jsou přímo v kódu (vizual.js, funkce <code>flow</code>) a kreslí se písmem Geist Mono. Na úzkém displeji se tok sám otočí na výšku.</p>
+  <div class="grid" id="flowGrid"></div>
+</div></section>
+
+<section><div class="wrap">
+  <h3>vizual.js · hlavička produktových stránek</h3>
+  <h2>Vizuály <em>produktů</em></h2>
+  <p>Na webu leží canvas absolutně přes celou hlavičku (<code>position:absolute; inset:0</code>) a text je nad ním. <code>data-live="1"</code> = animuje se, kdykoli je vidět.</p>
+  <div class="grid" id="prodGrid"></div>
+<pre>&lt;header class="hero" style="position:relative"&gt;
+  &lt;canvas class="viz" data-viz="radix" data-live="1" aria-hidden="true"
+          style="position:absolute;inset:0;width:100%;height:100%"&gt;&lt;/canvas&gt;
+  …text hlavičky…
+&lt;/header&gt;</pre>
+</div></section>
+
+<section><div class="wrap">
+  <h3>vizual.js · data-live="hover" · karty produktů</h3>
+  <h2>Karty: animace <em>pod kurzorem</em></h2>
+  <p>Na kartách (odkazy na produkty) stojí animace na místě a rozběhne se, až když na kartu najede kurzor nebo na ni přejde fokus z klávesnice. Najeď myší na kartu.</p>
+  <div class="grid">
+    <a class="card" href="#" onclick="return false"><div class="box"><canvas class="viz" style="height:100%" data-viz="adwazir" data-live="hover" aria-hidden="true"></canvas></div><p class="cap"><b>adwazir</b> · data-live="hover"</p></a>
+    <a class="card" href="#" onclick="return false"><div class="box"><canvas class="viz" style="height:100%" data-viz="opus" data-live="hover" aria-hidden="true"></canvas></div><p class="cap"><b>opus</b> · data-live="hover"</p></a>
+  </div>
+<pre>&lt;a class="hc" href="vezir.html"&gt;
+  &lt;div class="pic"&gt;&lt;canvas class="viz" data-viz="adwazir" data-live="hover" aria-hidden="true"&gt;&lt;/canvas&gt;&lt;/div&gt;
+  …
+&lt;/a&gt;</pre>
+</div></section>
+
+<section><div class="wrap">
+  <h3>vizual.js · data-viz="pcdline" · fáze Skica → Návrh → Stavba</h3>
+  <h2>Linka <em>fází</em></h2>
+  <p>Tři brány pro Skicu, Návrh a Stavbu. <code>data-on</code> říká, které fáze svítí (0 = Skica, 1 = Návrh, 2 = Stavba). <code>data-quiet="1"</code> ubere částice, používá se na stránce Power Change Delivery.</p>
+  <div class="box"><canvas class="viz h-line" data-viz="pcdline" data-on="0,1" data-live="1" aria-hidden="true"></canvas></div>
+  <p class="cap"><b>data-on="0,1"</b> · Půdorys (Skica + Návrh)</p>
+  <div class="box" style="margin-top:16px"><canvas class="viz h-line" data-viz="pcdline" data-on="2" data-live="1" aria-hidden="true"></canvas></div>
+  <p class="cap"><b>data-on="2"</b> · Dílo, Vezír, Výjezd (Stavba)</p>
+  <div class="box" style="margin-top:16px"><canvas class="viz h-line" data-viz="pcdline" data-on="0,1,2" data-quiet="1" data-live="1" aria-hidden="true"></canvas></div>
+  <p class="cap"><b>data-on="0,1,2" data-quiet="1"</b> · Power Change Delivery</p>
+<pre>&lt;canvas class="viz" data-viz="pcdline" data-on="0,1" data-live="1" aria-hidden="true"&gt;&lt;/canvas&gt;</pre>
+</div></section>
+
+<section><div class="wrap">
+  <h3>vizual.js · data-viz="steps" · „Jak to probíhá“</h3>
+  <h2>Linka <em>kroků</em></h2>
+  <p>Světlo postupně rozsvěcuje zastávky. <code>data-xs</code> jsou pozice zastávek 0–1 zleva. Na webu je dopočítává malý skript podle pozic sloupců s texty kroků (viz README); bez něj se použijí čtyři rovnoměrné zastávky.</p>
+  <div class="box"><canvas class="viz h-steps" data-viz="steps" data-live="1" aria-hidden="true"></canvas></div>
+  <div class="box" style="margin-top:16px"><canvas class="viz h-steps" data-viz="steps" data-xs="0.004,0.333,0.666" data-live="1" aria-hidden="true"></canvas></div>
+  <p class="cap"><b>data-xs="0.004,0.333,0.666"</b> · tři kroky</p>
+<pre>&lt;canvas class="viz" data-viz="steps" data-xs="0.004,0.333,0.666" data-live="1" aria-hidden="true"&gt;&lt;/canvas&gt;</pre>
+</div></section>
+
+<script>
+/* Ukázky se vkládají před načtením vizual.js – knihovna při startu najde všechny canvas.viz sama. */
+(function(){
+  var FLOW=[['free','zdravý stav · homepage „Nechcete jinou firmu…“ (data-labels="0")'],
+    ['clot','Rozhodují jiní, ale já nesu faktickou odpovědnost.'],
+    ['one','Všechno musím rozhodnout sám.'],
+    ['scatter','Na poradách se toho hodně řekne, ale málo rozhodne.'],
+    ['stall','Rozhodnutí padne, ale nepřetaví se v realitu.'],
+    ['astray','Na plánování a rozhodování nám nezbývá čas.'],
+    ['fog','stránka Power Change Delivery'],
+    ['loop','případová studie (výrobní firma)']];
+  var g=document.getElementById('flowGrid');
+  FLOW.forEach(function(f){var d=document.createElement('div');
+    d.innerHTML='<div class="box"><canvas class="viz h-flow" data-viz="flow" data-case="'+f[0]+'" data-live="1"'+(f[0]==='free'?' data-labels="0"':'')+' aria-hidden="true"></canvas></div><p class="cap"><b>data-case="'+f[0]+'"</b> · '+f[1]+'</p>';
+    g.appendChild(d);});
+  var PROD=[['radix','Půdorys'],['opus','Dílo'],['adwazir','Vezír'],['otium','Výjezd'],['ee','Manažerská zkušenost'],['pcd','Power Change Delivery']];
+  var p=document.getElementById('prodGrid');
+  PROD.forEach(function(x){var d=document.createElement('div');
+    d.innerHTML='<div class="box"><canvas class="viz h-hero" style="height:240px" data-viz="'+x[0]+'" data-live="1" aria-hidden="true"></canvas></div><p class="cap"><b>data-viz="'+x[0]+'"</b> · '+x[1]+'</p>';
+    p.appendChild(d);});
+  /* přepínač bolestí */
+  var cases=FLOW.slice(1,6),ctl=document.getElementById('painCtl'),pq=document.getElementById('pq'),btns=[];
+  function set(i){var cv=document.getElementById('whyCv');cv.dataset.case=cases[i][0];if(window.CoMViz)CoMViz.refresh(cv);
+    pq.textContent='„'+cases[i][1]+'“';btns.forEach(function(b,j){b.setAttribute('aria-pressed',j===i?'true':'false');});}
+  cases.forEach(function(c,i){var b=document.createElement('button');b.type='button';b.textContent=c[0];b.addEventListener('click',function(){set(i);});ctl.appendChild(b);btns.push(b);});
+  window.__setPain=set;
+})();
+</script>
+<script src="vizual.js"></script>
+<script src="pozadi.js"></script>
+<script>
+  window.__setPain(0);
+  var pozadi=CoMPozadi(document.getElementById('fx'));
+  [].forEach.call(document.querySelectorAll('#glowCtl button'),function(b,_,all){b.addEventListener('click',function(){pozadi.setGlow(parseFloat(b.dataset.g));[].forEach.call(document.querySelectorAll('#glowCtl button'),function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});});});
+</script>
+</body>
+</html>
